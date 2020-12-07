@@ -618,12 +618,13 @@ function namecheapssl_CreateAccount($params) {
     $queryData = array(
         "userid" => $params["clientsdetails"]["userid"],
         "serviceid" => $params["serviceid"],
+        "addon_id" => 0,
 //      "remoteid"  => $orderId,
         "remoteid" => $certificateId,
         "module" => "namecheapssl",
         "certtype" => $certtype,
-        "provisiondate" => "0000-00-00",
         "configdata" => "",
+        "completiondate" => "0000-00-00",
         "status" => _namecheapssl_getIncompleteStatus()
     );
     $sslorderid = NcSql::insert('tblsslorders',$queryData);
