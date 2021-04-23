@@ -2384,7 +2384,7 @@ function namecheapssl_ClientArea($params) {
         $code .= '<input type="submit" value="' . $_LANG['ncssl_view_certificate_details'] . '" />' . "\n";
         $code .= '</form></span>' . "\n";
     }
-
+    
     return $code;
 }
 
