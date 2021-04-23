@@ -558,9 +558,7 @@ $(document).ready(function() {
 function namecheapssl_CreateAccount($params) {
 
     if (!namecheapssl_check_install()) {
-        return
-                "Namecheap SSL Module error. Addon Module Namecheap SSL Module Addon hasn't been activated/upgraded. Please go to Setup - Addon Modules and perform activation/go to addon page."
-        ;
+        return "Namecheap SSL Module error. Addon Module Namecheap SSL Module Addon hasn't been activated/upgraded. Please go to Setup - Addon Modules and perform activation/go to addon page.";
     }
 
     global $CONFIG;
