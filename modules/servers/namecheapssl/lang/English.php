@@ -159,7 +159,7 @@ $_MOD_LANG['ncssl_addon_changes_saved_success'] = 'Changes Saved Successfully!';
 
 $_MOD_LANG['ncssl_http_based_validation'] = "HTTP based validation";
 $_MOD_LANG['ncssl_show_validation_file_contents'] = 'Show validation file contents';
-$_MOD_LANG['ncssl_custom_phrase_sslconfigcompletedetails'] = 'Please create a file named<br /><br />%filename%<br /><br />with contents<br /><br />%contents%<br /><br />and put it to the following location on your hosting server: http(s)://example.com/.well-known/pki-validation/<filename.txt>. It may take some time for file to be automatically validated and cert to be issued by Certificate Authority';
+$_MOD_LANG['ncssl_custom_phrase_sslconfigcompletedetails'] = 'Please create a file named <code>%filename%</code> with contents:<br /><br /> <code>%contents%</code><br /><br /> Then upload the file so that it is accessibile at the following URL: http(s)://yourdomain.com/.well-known/pki-validation/%filename%<br /><br />It may take some time for file to be automatically validated and cert to be issued by the Certifying Authority';
 $_MOD_LANG['ncssl_download_certificate'] = "Download certificate"; 
 
 

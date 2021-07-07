@@ -2648,7 +2648,7 @@ function namecheapssl_show_validation_file_contents($params){
     $pagearray = array(
         'templatefile' => 'show_validation_file_contents',
         'vars' => array(
-            'phrase'=> htmlspecialchars($phrase),
+            'phrase'=> $phrase,
             'serviceid' => (int)$params['serviceid']
         )
     );
