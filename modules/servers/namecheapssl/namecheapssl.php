@@ -622,19 +622,30 @@ function namecheapssl_CreateAccount($params) {
         "module" => "namecheapssl",
         "certtype" => $certtype,
         "configdata" => "",
+        "authdata"  => NULL,
         "completiondate" => "0000-00-00",
-        "status" => _namecheapssl_getIncompleteStatus()
+        "status" => _namecheapssl_getIncompleteStatus(),
+        "certificate_expiry_date" => NULL,
+        "created_at" => \Carbon\Carbon::now(),
+        "updated_at" => \Carbon\Carbon::now(),
     );
     $sslorderid = NcSql::insert('tblsslorders',$queryData);
 
 
     // 2. Create record at custom module table
     $queryData = array(
-        'id' => $sslorderid,
-        'user_id' => $params["clientsdetails"]["userid"],
+        'id'            => $sslorderid,
+        'user_id'       => $params["clientsdetails"]["userid"],
         'certificate_id' => $certificateId,
-        'type' => $certtype,
-        'period' => $certyears,
+        'type'          => $certtype,
+        'period'        => $certyears,
+        // The following fields are filled in later, must init with blank data
+        'admin_email'   => '',
+        'reissue'       => 0,
+        'file_name'     => NULL,
+        'file_content'  => NULL,
+        'configdata_copy' => NULL,
+        'revoke_data'   => NULL,
     );
     NcSql::insert('mod_namecheapssl', $queryData);
     
