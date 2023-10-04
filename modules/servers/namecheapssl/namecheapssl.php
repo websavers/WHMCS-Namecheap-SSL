@@ -625,7 +625,7 @@ function namecheapssl_CreateAccount($params) {
         "authdata"  => NULL,
         "completiondate" => "0000-00-00",
         "status" => _namecheapssl_getIncompleteStatus(),
-        "certificate_expiry_date" => NULL,
+        "certificate_expiry_date" => "0000-00-00",
         "created_at" => \Carbon\Carbon::now(),
         "updated_at" => \Carbon\Carbon::now(),
     );
