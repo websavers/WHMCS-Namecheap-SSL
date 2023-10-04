@@ -1597,65 +1597,67 @@ function namecheapssl_SSLStepThree($params) {
                         $response = $api->request("namecheap.ssl.getList", $requestParamsUseTokens);
                         $result = $api->parseResponse($response);
 
-                        foreach ($result['SSLListResult']['SSL'] as $k => $certInfo) {
+                        if ( is_array($result) && is_array($result['SSLListResult']) ){
+                            foreach ($result['SSLListResult']['SSL'] as $k => $certInfo) {
 
-                            $k = (string) $k;
-                            if ($k != '@attributes') {
-                                $certInfo = $certInfo['@attributes'];
-                            }
-
-                            // check activation expire date for free tokens
-                            if (!empty($certInfo['ActivationExpireDate'])) {
-
-                                $now = time() + date("Z");
-                                $gmt = $api->getGmtTS($response);
-                                $expireTimestamp = strtotime($certInfo['ActivationExpireDate']) + $gmt;
-
-                                // skip expired free certificate
-                                if ($expireTimestamp < $now) {
-                                    continue;
+                                $k = (string) $k;
+                                if ($k != '@attributes') {
+                                    $certInfo = $certInfo['@attributes'];
                                 }
-                            }
 
-                            if (strtolower(trim($certInfo['SSLType'])) == strtolower($certificateType)) {
-                                
-                                $sql = "SELECT id FROM tblsslorders WHERE remoteid='".(int)$certInfo['CertificateID']."'";
-                                if (0 == NcSql::sqlNumRows($sql)) {
+                                // check activation expire date for free tokens
+                                if (!empty($certInfo['ActivationExpireDate'])) {
+
+                                    $now = time() + date("Z");
+                                    $gmt = $api->getGmtTS($response);
+                                    $expireTimestamp = strtotime($certInfo['ActivationExpireDate']) + $gmt;
+
+                                    // skip expired free certificate
+                                    if ($expireTimestamp < $now) {
+                                        continue;
+                                    }
+                                }
+
+                                if (strtolower(trim($certInfo['SSLType'])) == strtolower($certificateType)) {
                                     
-                                    $certificateId = $certInfo['CertificateID'];
-                                    
-                                    // 
-                                    if($sanProcess){
-                                        try{
-                                            $api = _namecheapssl_initApi($params);
-                                            $response = $api->request("namecheap.ssl.getInfo", array('CertificateID' => (int) $certificateId ));
-                                            $result = $api->parseResponse($response);               
-                                        } catch (Exception $e) {
-                                            return array('error' => $e->getMessage());
-                                        }            
-                                        $existingSansCount = !empty($result['SSLGetInfoResult']['@attributes']['SANSCount']) ? $result['SSLGetInfoResult']['@attributes']['SANSCount'] : 0;            
-                                        $existingAdditionalSansCount = $existingSansCount - _namecheapssl_getDefaultSunCount($sslOrderCustomInfo['type']);
-                                        if($currentAdditionalSansCount>$existingAdditionalSansCount){
+                                    $sql = "SELECT id FROM tblsslorders WHERE remoteid='".(int)$certInfo['CertificateID']."'";
+                                    if (0 == NcSql::sqlNumRows($sql)) {
+                                        
+                                        $certificateId = $certInfo['CertificateID'];
+                                        
+                                        // 
+                                        if($sanProcess){
                                             try{
-                                                // call .purchasemoresans
                                                 $api = _namecheapssl_initApi($params);
-                                                $response = $api->request("namecheap.ssl.purchasemoresans", 
-                                                        array(
-                                                            'CertificateID' => (int) $certificateId ,
-                                                            'NumberOfSANSToAdd' => $currentAdditionalSansCount - $existingAdditionalSansCount
-                                                        )
-                                                        );
-                                                $result = $api->parseResponse($response);
+                                                $response = $api->request("namecheap.ssl.getInfo", array('CertificateID' => (int) $certificateId ));
+                                                $result = $api->parseResponse($response);               
                                             } catch (Exception $e) {
                                                 return array('error' => $e->getMessage());
+                                            }            
+                                            $existingSansCount = !empty($result['SSLGetInfoResult']['@attributes']['SANSCount']) ? $result['SSLGetInfoResult']['@attributes']['SANSCount'] : 0;            
+                                            $existingAdditionalSansCount = $existingSansCount - _namecheapssl_getDefaultSunCount($sslOrderCustomInfo['type']);
+                                            if($currentAdditionalSansCount>$existingAdditionalSansCount){
+                                                try{
+                                                    // call .purchasemoresans
+                                                    $api = _namecheapssl_initApi($params);
+                                                    $response = $api->request("namecheap.ssl.purchasemoresans", 
+                                                            array(
+                                                                'CertificateID' => (int) $certificateId ,
+                                                                'NumberOfSANSToAdd' => $currentAdditionalSansCount - $existingAdditionalSansCount
+                                                            )
+                                                            );
+                                                    $result = $api->parseResponse($response);
+                                                } catch (Exception $e) {
+                                                    return array('error' => $e->getMessage());
+                                                }
                                             }
                                         }
+                                        //
+                                        
+                                        $certificateId = $certInfo['CertificateID'];
+                                        namecheapssl_log('client.stepThree', 'client_step_three_remote_id_selected_from_account', array($sslOrderInfo['certtype'], $certificateId), $params['serviceid']);
+                                        break 2;
                                     }
-                                    //
-                                    
-                                    $certificateId = $certInfo['CertificateID'];
-                                    namecheapssl_log('client.stepThree', 'client_step_three_remote_id_selected_from_account', array($sslOrderInfo['certtype'], $certificateId), $params['serviceid']);
-                                    break 2;
                                 }
                             }
                         }
